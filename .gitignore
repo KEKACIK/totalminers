@@ -1,0 +1,7 @@
+/.venv
+/.idea
+/.git
+/assets/*
+/pgdata
+.env
+test.py

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <table class="table">
+        <h1>Воркеры пользователя {{ user.email }}</h1>
+        <a href="{{ url_for('workers_router.create_boundary', id=user.id) }}"
+           class="btn btn-success rounded-pill px-3">
+            Добавить Boundary
+        </a>
+        <a href="{{ url_for('workers_router.init_real', id=user.id) }}"
+           class="btn btn-success rounded-pill px-3">
+            Инициализировать Физический
+        </a>
+
+        <thead>
+        <tr>
+            <th scope="col">Название</th>
+            <th scope="col">Worker ID</th>
+            <th scope="col">Тип</th>
+            <th scope="col">Headframe</th>
+            <th scope="col">База данных</th>
+            <th scope="col">Статус</th>
+            <th scope="col">Действие</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for worker in workers %}
+            <tr>
+                <th>{{ worker.name }}</th>
+                <th>{{ worker.id }}</th>
+                <th>{{ worker.type }}</th>
+                <th>{% if worker.frame %} Да {% else %} Нет {% endif %}</th>
+                <th>{% if worker.db %} Да {% else %} Нет {% endif %}</th>
+                <th>{{ worker.status }}</th>
+                <th>
+                    {% if worker.db %}
+                        <form action="{{ url_for('workers_router.delete_worker', id=user.id) }}">
+                            <input type="hidden" name="worker_id" value="{{ worker.id }}">
+                            <input type="submit" class="btn btn-danger rounded-pill px-3" value="Отключить">
+                        </form>
+                    {% endif %}
+                </th>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
