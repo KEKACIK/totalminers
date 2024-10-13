@@ -13,16 +13,18 @@ class HashRateTypes:
     TH = 'TH/s'
     PH = 'PH/s'
 
+    def get_all(self) -> list:
+        return [self.HASH, self.KH, self.MH, self.GH, self.TH, self.PH]
+
     def get(self, hash_type: str) -> int:
-        data = {
+        return {
             self.HASH: 10 ** 0,
             self.KH: 10 ** 3,
             self.MH: 10 ** 6,
             self.GH: 10 ** 9,
             self.TH: 10 ** 12,
             self.PH: 10 ** 15,
-        }
-        return data.get(hash_type, 1)
+        }.get(hash_type, 1)
 
 
 def auth_required(func):

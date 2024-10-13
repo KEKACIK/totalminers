@@ -28,15 +28,17 @@ class HeadframeApi:
         logging.critical(f'GET {url} | {json.dumps(json_data)}')
         return json_data
 
-    def request_post(self, url: str, data: dict = None):
-        r = requests.post(url=url, data=data, cookies=self.cookie)
+    def request_post(self, url: str, data: dict = None, json_: dict = None):
+        r = requests.post(url=url, data=data, json=json_, cookies=self.cookie)
         json_data = r.json()
         logging.critical(f'POST {url} | {json.dumps(json_data)}')
         return json_data
 
     def request_delete(self, url: str, data: dict = None):
         r = requests.delete(url=url, data=data, cookies=self.cookie)
-        json_data = r.json()
+        json_data = {}
+        if r.status_code != 204:
+            json_data = r.json()
         logging.critical(f'DELETE {url} | {json.dumps(json_data)}')
         return json_data
 
@@ -46,9 +48,15 @@ class HeadframeApi:
 
     def create_boundary(self, name: str, recipient_miner_id: str, donor_miner_id: str, hash_rate: int) -> dict:
         url = f'{self.url}/workers/boundary'
+        logging.critical({
+            "name": name,
+            "recipient_miner_id": recipient_miner_id,
+            "donor_miner_id": donor_miner_id,
+            "hashrate": hash_rate,
+        })
         return self.request_post(
             url=url,
-            data={
+            json_={
                 "name": name,
                 "recipient_miner_id": recipient_miner_id,
                 "donor_miner_id": donor_miner_id,
@@ -58,24 +66,11 @@ class HeadframeApi:
 
     def delete_boundary(self, worker_id: str) -> dict:
         url = f'{self.url}/workers/boundary/{worker_id}'
-        return self.request_post(url=url)
+        return self.request_delete(url=url)
 
-    """
-    API PLUS
-    """
-
-    def get_miner_workers(self, miner_id: str) -> list[dict]:
+    def get_miner_workers(self, miner_id: str) -> dict:
         url = f'{self.url}/miners/{miner_id}/workers'
-        result = self.request_get(url=url)
-        return [
-            {
-                'id': worker['id'],
-                'name': worker['name'],
-                'type': worker['behavior'],
-                'status': worker['status'],
-            }
-            for worker in result.get('data', [])
-        ]
+        return self.request_get(url=url)
 
 
 headframe_api = HeadframeApi(token=settings.token)

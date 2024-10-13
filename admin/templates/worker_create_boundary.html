@@ -16,11 +16,9 @@
     </style>
     {% with messages = get_flashed_messages(with_categories=True) %}
         {% if messages %}
-            <ul>
-                {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
+            {% for category, message in messages %}
+                <div style="color:red;">{{ message }}</div>
+            {% endfor %}
         {% endif %}
     {% endwith %}
     <h2>Подключение boundary воркера для пользователя: {{ user.email }}</h2>
@@ -44,12 +42,11 @@
         <div class="form-group">
             <label for="hash_type">Тип хэшрейта</label>
             <select class="form-control" id="hash_type" name="hash_type">
-                <option value="low">Низкий</option>
-                <option value="medium">Средний</option>
-                <option value="high">Высокий</option>
+                {% for hash_type in hash_types %}
+                    <option value="{{ hash_type }}">{{ hash_type }}</option>
+                {% endfor %}
             </select>
         </div>
-
         <button class="btn btn-primary rounded-pill px-3" type="submit">Создать</button>
     </form>
 {% endblock %}

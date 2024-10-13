@@ -19,12 +19,21 @@
             <li><b>Язык: </b>{{ user.lang }}</li>
             <li><b>Доступ: </b>{% if user.access_allowed %}Есть{% else %}Нет{% endif %}</li>
         </ul>
-        <a href="{{ url_for('users_router.users_block', id=user.id) }}" class="btn btn-danger rounded-pill px-3">
-            Заблокировать
-        </a>
-        <a href="{{ url_for('users_router.users_unblock', id=user.id) }}" class="btn btn-success rounded-pill px-3">
-            Разблокировать
-        </a>
-        <input type="submit" class="btn btn-success rounded-pill px-3" value="Сохранить">
+        <div class="my-2">
+            <a class="btn btn-primary" href="https://pool.headframe.io/customers/{{ user.miner_id }}" target="_blank">
+                Открыть аккаунт
+            </a>
+        </div>
+        <div class="my-2">
+            <a href="{{ url_for('users_router.users_block', id=user.id) }}" class="btn btn-danger rounded-pill">
+                Заблокировать
+            </a>
+            <a href="{{ url_for('users_router.users_unblock', id=user.id) }}" class="btn btn-success rounded-pill">
+                Разблокировать
+            </a>
+        </div>
+        <div class="my-2">
+            <input type="submit" class="btn btn-success rounded-pill" value="Сохранить">
+        </div>
     </form>
 {% endblock %}

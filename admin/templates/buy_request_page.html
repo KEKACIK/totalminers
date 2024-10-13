@@ -28,7 +28,7 @@
                 <p>Телеграм: <b>{{ buy_request.user.telegram }}</b></p>
                 <p>Headframe-аккаунт: <b>{{ buy_request.user.miner_name }}</b></p>
                 <form action="{{ url_for('billings_router.page', id=billing.id) }}">
-                    <button class="btn btn-primary rounded-pill px-3" type="submit">Просмотреть</button>
+                    <button class="btn btn-primary rounded-pill px-3" type="submit">Просмотреть счёт</button>
                 </form>
             </div>
             <div class="block">
@@ -60,13 +60,9 @@
             </div>
             <div class="block">
                 <h3>Подключить воркеры:</h3>
-                <a href="{{ url_for('workers_router.create_boundary',id=buy_request.user.id) }}"
-                   class="btn btn-success rounded-pill px-3">
+                <a href="{{ url_for('workers_router.create_boundary', id=buy_request.user.id) }}"
+                   class="btn btn-success rounded-pill">
                     Добавить Boundary
-                </a>
-                <a href="{{ url_for('workers_router.init_real',id=buy_request.user.id) }}"
-                   class="btn btn-success rounded-pill px-3">
-                    Инициализировать Физический
                 </a>
             </div>
             <div class="block">

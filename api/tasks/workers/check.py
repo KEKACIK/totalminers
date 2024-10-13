@@ -26,6 +26,8 @@ async def function() -> None:
                 continue
             if not worker_db.miner_item:
                 await BaseService().update(worker_db, hidden=True)
+        if workers.get('data') is None:
+            continue
         for worker_db in await BaseService().get_all(Worker, user_id=user.id):
             if worker_db.id_str in workers_site_id_str:
                 continue

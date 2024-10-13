@@ -1,7 +1,7 @@
 from typing import Optional
 
 from admin.db.models import User, Billing, BuyRequest, MinerItem, Image, Ticket, Message, MinerItemCategory, Feedback, \
-    BuyRequestMinerItem
+    BuyRequestMinerItem, Worker
 from admin.utils import hash_to_str, value_to_float
 from config import settings
 
@@ -115,9 +115,6 @@ def generate_miner_item_dict(miner_item: MinerItem) -> dict:
         'energy_consumption': miner_item.energy_consumption,
         'price': value_to_float(value=miner_item.price, decimal=settings.usd_decimal),
         'image': generate_image_dict(image=miner_item.image),
-        'income': value_to_float(value=miner_item.income, decimal=settings.usd_decimal),
-        'hosting': value_to_float(value=miner_item.hosting, decimal=settings.usd_decimal),
-        'profit': value_to_float(value=miner_item.profit, decimal=settings.usd_decimal),
         'discount_count': miner_item.discount_count,
         'discount_value': value_to_float(value=miner_item.discount_value, decimal=settings.rate_decimal),
         'priority': miner_item.priority,
@@ -169,5 +166,22 @@ def generate_message_dict(message: Message) -> dict:
         'ticket': generate_ticket_dict(ticket=message.ticket),
         'sender': message.sender,
         'content': message.content,
+        'image': generate_image_dict(image=message.image) or None,
         'created': message.created_at.strftime(settings.date_time_format),
+    }
+
+
+def generate_miner_worker_dict(worker: Worker, workers_statuses: dict) -> dict:
+    if not worker:
+        return {}
+    return {
+        'id': worker.id,
+        'id_str': worker.id_str,
+        'name': worker.name,
+        'behavior': worker.behavior,
+        'user': generate_user_dict(user=worker.user),
+        'miner_item': generate_miner_item_dict(miner_item=worker.miner_item),
+        'status': workers_statuses.get(worker.id_str, 'unavailable'),
+        'hidden': worker.hidden,
+        'created': worker.created.strftime(format=settings.date_time_format),
     }

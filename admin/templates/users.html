@@ -20,10 +20,12 @@
                 <th>{{ user.email }}</th>
                 <th>{{ user.telegram }}</th>
                 <th>
-                    <a class="btn btn-primary"
-                       href="{{ url_for('users_router.users_page', id=user.id) }}">Просмотреть</a>
-                    <a class="btn btn-primary"
-                       href="{{ url_for('workers_router.users_workers_page', id=user.id) }}">Воркеры</a>
+                    <a class="btn btn-primary" href="{{ url_for('users_router.users_page', id=user.id) }}">
+                        Просмотреть
+                    </a>
+                    <a class="btn btn-primary" href="{{ url_for('workers_router.users_workers_page', id=user.id) }}">
+                        Воркеры
+                    </a>
                 </th>
             </tr>
         {% endfor %}
