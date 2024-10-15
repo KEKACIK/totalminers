@@ -2,10 +2,10 @@ import logging
 
 from flask import Blueprint, request, render_template, redirect, url_for, flash
 
-from admin.db.database import basic_get, basic_create, basic_get_all, basic_update
+from admin.db.database import basic_get, basic_create, basic_update, basic_get_all_asc
 from admin.db.models import User, Worker, MinerItem
 from admin.modules.headframe import headframe_api
-from admin.service import generate_user_dict, generate_miner_worker_dict
+from admin.service import generate_user_dict, generate_miner_worker_dict, generate_miner_item_dict
 from admin.utils import auth_required, HashRateTypes
 
 workers_router = Blueprint('workers_router', 'workers_router')
@@ -15,12 +15,11 @@ workers_router = Blueprint('workers_router', 'workers_router')
 @auth_required
 def users_workers_page(id: int):
     user = basic_get(User, id=id)
-    workers_db = basic_get_all(Worker, user_id=user.id)
+    workers_db = basic_get_all_asc(Worker, user_id=user.id)
     workers_site = headframe_api.get_miner_workers(user.miner_id)
     workers_statuses = {}
     for worker_site in workers_site.get('data', []):
         workers_statuses[worker_site['id']] = worker_site['status']
-
     return render_template(
         'users_workers.html',
         user=generate_user_dict(user=user),
@@ -31,9 +30,27 @@ def users_workers_page(id: int):
     )
 
 
+@workers_router.get('/workers/<worker_id>')
+@auth_required
+def worker_page(worker_id: int):
+    worker = basic_get(Worker, id=worker_id)
+    workers_statuses = {}
+    for worker_site in headframe_api.get_miner_workers(worker.user.miner_id).get('data', []):
+        workers_statuses[worker_site['id']] = worker_site['status']
+    return render_template(
+        'worker_page.html',
+        user=generate_user_dict(user=worker.user),
+        worker=generate_miner_worker_dict(worker=worker, workers_statuses=workers_statuses),
+        miners_items=[
+            generate_miner_item_dict(miner_item=miner_item)
+            for miner_item in basic_get_all_asc(MinerItem)
+        ],
+    )
+
+
 @workers_router.get('/workers/<id>/create')  # BOUNDARY CREATE
 @auth_required
-def create_boundary(id):
+def create_boundary(id: int):
     user = basic_get(User, id=id)
     return render_template(
         'worker_create_boundary.html',
@@ -69,13 +86,6 @@ def create_boundary_post(id: int):
     if not miner_item:
         flash('Поле "ID Товара (майнера)" товар не найден')
         return redirect(url_for('workers_router.create_boundary', id=id))
-    logging.critical(dict(
-        name=name,
-        recipient_miner_id=user.miner_id,
-        donor_miner_id=donor_miner_id,
-        hash_rate=hash_rate,
-        hash_type=hash_type,
-    ))
     boundary = headframe_api.create_boundary(
         name=name,
         recipient_miner_id=user.miner_id,
@@ -109,13 +119,36 @@ def delete_worker(id: int):
     return redirect(url_for('workers_router.users_workers_page', id=id))
 
 
-@workers_router.get('/workers/<id>/update')
+@workers_router.post('/workers/<worker_id>/update')
 @auth_required
-def update_worker(id: int):
-    worker = basic_get(Worker, id=request.args.get('worker_id'))
-    type_ = request.args.get('type')
-    if type_ == 'hidden_true':
-        basic_update(worker, hidden=True)
-    elif type_ == 'hidden_false':
-        basic_update(worker, hidden=False)
-    return redirect(url_for('workers_router.users_workers_page', id=id))
+def update(worker_id: int):
+    worker = basic_get(Worker, id=worker_id)
+    if not worker:
+        flash('Воркер не найден')
+        return redirect(url_for('workers_router.worker_page', worker_id=worker.id))
+    id_str = request.form.get('id_str')
+    if not id_str:
+        id_str = None
+    name = request.form.get('name')
+    if not name:
+        name = None
+    behavior = request.form.get('behavior')
+    if not behavior:
+        behavior = None
+    miner_item_id = request.form.get('miner_item_id')
+    if not miner_item_id:
+        miner_item_id = None
+    else:
+        miner_item_id = int(miner_item_id)
+    hidden = request.form.get('hidden') == 'on'
+    logging.critical(request.form)
+    logging.critical([id_str, name, behavior, miner_item_id, hidden])
+    basic_update(
+        worker,
+        id_str=id_str,
+        name=name,
+        behavior=behavior,
+        miner_item_id=miner_item_id,
+        hidden=hidden,
+    )
+    return redirect(url_for('workers_router.worker_page', worker_id=worker.id))

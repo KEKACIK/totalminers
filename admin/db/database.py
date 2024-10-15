@@ -174,7 +174,7 @@ def basic_get(db_model, **filters):
 
 
 def basic_get_all(db_model, **filters):
-    result = session.execute(Select(db_model).filter_by(**filters))
+    result = session.execute(Select(db_model).filter_by(**filters).order_by(db_model))
     return result.scalars().all()
 
 

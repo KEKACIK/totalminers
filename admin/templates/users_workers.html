@@ -27,8 +27,12 @@
         <tbody>
         {% for worker in workers %}
             <tr>
-                <th>{{ worker.id_str }}</th>
-                <th>{{ worker.name }}</th>
+                <th>
+                    <a href="{{ url_for('workers_router.worker_page', worker_id=worker.id) }}">{{ worker.id_str }}</a>
+                </th>
+                <th>
+                    <a href="{{ url_for('workers_router.worker_page', worker_id=worker.id) }}">{{ worker.name }}</a>
+                </th>
                 <th>{{ worker.behavior }}</th>
                 <th>{{ worker.miner_item.id }} - {{ worker.miner_item.name }}</th>
                 <th>{{ worker.status }}</th>
@@ -40,13 +44,6 @@
                             <input type="submit" class="btn btn-danger rounded-pill px-3" value="Удалить">
                         </form>
                     {% endif %}
-                    <form action="{{ url_for('workers_router.delete_worker', id=user.id) }}">
-                        <input type="hidden" name="worker_id" value="{{ worker.id }}">
-                        <input type="hidden" name="update_type"
-                               value="{% if worker.hidden %}update_false{% else %}update_true{% endif %}">
-                        <input type="submit" class="btn btn-danger rounded-pill px-3"
-                               value="{% if worker.hidden %}Открыть{% else %}Скрыть{% endif %}">
-                    </form>
                 </th>
             </tr>
         {% endfor %}

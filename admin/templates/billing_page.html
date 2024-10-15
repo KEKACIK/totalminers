@@ -22,11 +22,12 @@
             <div class="form-group">
                 <label for="image">Картинка</label>
                 <input type="file" class="form-control" id="image" name="image">
-                <img src="{{ billing.image.url }}" height="256" width="256">
+                <a href="{{ billing.image.url }}">
+                    <img src="{{ billing.image.url }}" height="256" width="256" alt="{{ billing.image.filename }}">
+                </a>
             </div>
             <button type="submit">Отправить фото</button>
         </form>
-
         <div class="block">
             <form method="post" action="{{ url_for('billings_router.update_type', id=billing.id) }}">
                 <h4>Изменение типа платежа:</h4>
